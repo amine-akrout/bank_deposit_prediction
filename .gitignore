@@ -22,3 +22,6 @@ eda.ipynb
 # app
 app.py
 
+#
+static/*
+template/*
