@@ -20,8 +20,4 @@ catboost_info
 eda.ipynb
 
 # app
-app.py
-
-#
-static/*
-template/*
+test_pred.py
