@@ -1,0 +1,5 @@
+mlflow
+catboost==1.0.3
+cloudpickle==2.0.0
+ipywidgets==7.6.5
+scikit-learn==1.0.2

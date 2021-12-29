@@ -63,9 +63,9 @@ with mlflow.start_run(run_name="run") as run:
     pprint(artifacts)
     pprint(run.info.run_id)
 
-    model_path = 'mlruns/0/{}/artifacts/model'.format(run.info.run_id)
+    model_path = 'mlruns/0/{}/artifacts/catboost-model'.format(run.info.run_id)
     pprint(model_path)
 
-    # shutil.copytree(model_path, './model', dirs_exist_ok=True)
+    shutil.copytree(model_path, './catboost-model', dirs_exist_ok=True)
 
     
