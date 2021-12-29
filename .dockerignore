@@ -10,8 +10,19 @@ data/*
 # pycache
 __pycache__
 
-
 README.md
 
-
 model.py
+
+
+# mlflow articats 
+mlruns/*
+
+# catboost
+catboost_info
+
+# EDA notebook
+eda.ipynb
+
+# app
+test_pred.py
