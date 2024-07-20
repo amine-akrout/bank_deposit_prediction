@@ -1,0 +1,12 @@
+services:
+  airflow:
+    build:
+      context: airflow
+      dockerfile: Dockerfile
+    volumes:
+      - ./pipeline:/opt/airflow
+      - ./pipeline/dags:/opt/airflow/dags
+      - ./pipeline/plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    command: airflow standalone

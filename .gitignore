@@ -5,19 +5,30 @@ venv/
 .idea/
 
 # data
-data/*
+*/data/*
 
 # pycache
 __pycache__/
 
 # mlflow articats 
-mlruns/*
+*/mlruns/*
 
 # catboost
-catboost_info
+*/catboost_info
+
+# airflow logs
+*/logs/*
+pipeline/airflow-webserver.pid
+pipeline/airflow.cfg
+pipeline/airflow.db
+pipeline/standalone_admin_password.txt
+webserver_config.py
 
 # EDA notebook
 eda.ipynb
 
 # app
 test_pred.py
+
+# aws task definition
+aws-task-definition.json
