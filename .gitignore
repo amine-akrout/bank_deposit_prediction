@@ -32,3 +32,6 @@ test_pred.py
 
 # aws task definition
 aws-task-definition.json
+
+# env file
+.env
