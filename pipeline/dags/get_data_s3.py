@@ -62,36 +62,36 @@ def etl_to_s3_dag():
         return session.client("s3", endpoint_url=endpoint_url)
 
     @task
-    def create_bucket_if_not_exists(s3_client, bucket_name):
+    def create_bucket_if_not_exists(s3_client):
         """Create an S3 bucket if it does not already exist, with improved error handling and feedback."""
-        logging.info(f"Creating bucket '{bucket_name}' if it does not exist.")
+        logging.info(f"Creating bucket '{BUCKET_NAME}' if it does not exist.")
         try:
             # Check if the bucket already exists
-            if not s3_client.head_bucket(Bucket=bucket_name):
-                s3_client.create_bucket(Bucket=bucket_name)
-                logging.info(f"Bucket '{bucket_name}' created.")
+            if not s3_client.head_bucket(Bucket=BUCKET_NAME):
+                s3_client.create_bucket(Bucket=BUCKET_NAME)
+                logging.info(f"Bucket '{BUCKET_NAME}' created.")
             else:
-                logging.info(f"Bucket '{bucket_name}' already exists.")
+                logging.info(f"Bucket '{BUCKET_NAME}' already exists.")
         except s3_client.exceptions.NoSuchBucket:
-            s3_client.create_bucket(Bucket=bucket_name)
-            logging.info(f"Bucket '{bucket_name}' created.")
+            s3_client.create_bucket(Bucket=BUCKET_NAME)
+            logging.info(f"Bucket '{BUCKET_NAME}' created.")
         except s3_client.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "404":
-                s3_client.create_bucket(Bucket=bucket_name)
-                logging.info(f"Bucket '{bucket_name}' created.")
+                s3_client.create_bucket(Bucket=BUCKET_NAME)
+                logging.info(f"Bucket '{BUCKET_NAME}' created.")
             else:
-                logging.error(f"Failed to create bucket '{bucket_name}': {e}")
+                logging.error(f"Failed to create bucket '{BUCKET_NAME}': {e}")
         except Exception as e:
             logging.error(f"An unexpected error occurred: {e}")
 
     @task
-    def upload_data_to_s3(s3_client, data, bucket_name, object_name):
+    def upload_data_to_s3(s3_client, data):
         """Upload data to an S3 bucket with enhanced exception handling."""
         buffer = io.BytesIO()
         try:
             data.to_parquet(buffer, index=False)
             buffer.seek(0)
-            s3_client.upload_fileobj(buffer, bucket_name, object_name)
+            s3_client.upload_fileobj(buffer, BUCKET_NAME, OBJECT_NAME)
             print("Data saved in S3 bucket.")
         except boto3.exceptions.S3UploadFailedError as e:
             print(f"Failed to upload data to S3: {e}")
