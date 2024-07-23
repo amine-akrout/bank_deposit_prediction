@@ -10,3 +10,23 @@ services:
     ports:
       - "8080:8080"
     command: airflow standalone
+    networks:
+      - mlops-net
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: "server /data --console-address ':9001'"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    ports:
+      - 9000:9000
+      - 9001:9001
+    networks:
+      - mlops-net
+    volumes:
+      - ./minio/data:/data
+
+networks:
+  mlops-net:
+    driver: bridge
