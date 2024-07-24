@@ -165,6 +165,7 @@ def get_data():
     s3_connection = create_s3_connection()
     file = download_dataset("data/bank.parquet", "data/")
     data = read_data(file)
+    s3_connection >> file >> data
     return data
 
 
