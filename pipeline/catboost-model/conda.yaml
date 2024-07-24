@@ -1,12 +1,12 @@
 channels:
 - conda-forge
 dependencies:
-- python=3.9.16
-- pip<=22.3.1
+- python=3.9.18
+- pip<=24.0
 - pip:
   - mlflow==2.3
   - catboost==1.2
-  - cloudpickle==2.2.0
+  - cloudpickle==2.2.1
   - numpy==1.26.4
   - pandas==2.0.1
   - scikit-learn==1.2.2

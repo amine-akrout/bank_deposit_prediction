@@ -38,9 +38,7 @@ def create_s3_connection():
     # Load environment variables
     load_dotenv()
     aws_access_key_id = os.environ.get("S3_ACCESS_KEY")
-    print(f"aws_access_key_id: {aws_access_key_id}")
     aws_secret_access_key = os.environ.get("S3_SECRET_KEY")
-    print(f"aws_secret_access_key: {aws_secret_access_key}")
 
     s3_conn = Connection(
         conn_id="my_s3_connection",
@@ -97,8 +95,6 @@ def read_data(file_path: str):
 def split_data(data, test_size=0.3):
     logging.info("Splitting data into train and validation sets")
     data = data["data"]
-    print(data.head())
-    print(data.columns)
     y = data["deposit"]
     X = data.drop(columns="deposit", axis=1)
     cat_features = list(set(X.columns) - set(X._get_numeric_data().columns))

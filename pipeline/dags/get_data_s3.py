@@ -25,10 +25,7 @@ def create_s3_connection():
     # Load environment variables
     load_dotenv()
     aws_access_key_id = os.environ.get("S3_ACCESS_KEY")
-    print(f"aws_access_key_id: {aws_access_key_id}")
     aws_secret_access_key = os.environ.get("S3_SECRET_KEY")
-    print(f"aws_secret_access_key: {aws_secret_access_key}")
-
     s3_conn = Connection(
         conn_id="my_s3_connection",
         conn_type="aws",
@@ -64,13 +61,7 @@ def create_s3_connection():
 def fetch_data():
     """Fetch data using the UCIML repository."""
     logging.info("Fetching data from the UCIML repository.")
-    return fetch_ucirepo(id=222)
-
-
-@task
-def prepare_data(bank_marketing):
-    """Extract features and targets, and combine them into a DataFrame."""
-    logging.info("Preparing the data for upload.")
+    bank_marketing = fetch_ucirepo(id=222)
     features = bank_marketing.data.features
     targets = bank_marketing.data.targets
     # rename the target column to 'deposit'
@@ -82,7 +73,7 @@ def prepare_data(bank_marketing):
 def create_s3_bucket_if_not_exists():
     hook = S3Hook(aws_conn_id="my_s3_connection")
     # Check if the bucket already exists
-    if not hook.check_if_bucket_exists(BUCKET_NAME):
+    if not hook.check_for_bucket(BUCKET_NAME):
         try:
             # Create the bucket
             hook.create_bucket(BUCKET_NAME)
@@ -96,7 +87,7 @@ def create_s3_bucket_if_not_exists():
 @task
 def upload_data_to_s3(data):
     """Upload the data to an S3 bucket."""
-    data["data"].to_parquet(buffer, index=False)
+    data = data["data"]
     logging.info("Preparing data for upload to S3.")
 
     # Convert the DataFrame to a Parquet file in bytes
@@ -144,24 +135,15 @@ def end_pipeline():
 )
 def etl_to_s3_dag():
     # Define Task Flow
-    start_pipeline = start_pipeline()
+    start = start_pipeline()
     s3_connection = create_s3_connection()
     data = fetch_data()
-    prepared_data = prepare_data(data)
     create_s3_bucket = create_s3_bucket_if_not_exists()
-    upload_data = upload_data_to_s3(prepared_data)
-    end_pipeline = end_pipeline()
+    upload_data = upload_data_to_s3(data)
+    end = end_pipeline()
 
     # Define Task Dependencies
-    (
-        start_pipeline
-        >> s3_connection
-        >> data
-        >> prepared_data
-        >> create_s3_bucket
-        >> upload_data
-        >> end_pipeline
-    )
+    (start >> s3_connection >> data >> create_s3_bucket >> upload_data >> end)
 
 
 # Assign the DAG to a variable
