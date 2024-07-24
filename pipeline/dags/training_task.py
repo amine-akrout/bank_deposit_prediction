@@ -145,7 +145,6 @@ def train_log_model(training_data):
         logging.info(f"Model saved at: {model_path}")
 
 
-# create a task to delete the temporary files created during the pipeline (they are inside data/ folder and start with "airflow_tmp*")
 @task
 def delete_temp_files():
     logging.info("Deleting temporary files")
@@ -181,13 +180,12 @@ def ml_training_pipeline():
     start = start_pipeline()
 
     data = get_data()
-    # training_data = split_data(data)
-    # model_training = train_log_model(training_data)
+    training_data = split_data(data)
+    model_training = train_log_model(training_data)
     cleanup = delete_temp_files()
-    # end = end_pipeline()
-    # start >> data >> training_data >> model_training >> end
+    end = end_pipeline()
 
-    start >> data >> cleanup
+    start >> data >> training_data >> model_training >> cleanup >> end
 
 
 dag_instance = ml_training_pipeline()
