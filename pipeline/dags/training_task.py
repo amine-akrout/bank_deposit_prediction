@@ -9,6 +9,7 @@ from airflow.decorators import dag, task, task_group
 from airflow.models import Connection
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.settings import Session
+from airflow.utils.dates import days_ago
 from catboost import CatBoostClassifier
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
@@ -73,6 +74,8 @@ def create_s3_connection():
 
 @task
 def download_dataset(source_file, dest_file):
+    if not os.path.exists(dest_file):
+        os.makedirs(dest_file)
     hook = S3Hook("my_s3_connection")
     file_name = hook.download_file(
         key=source_file, bucket_name="data-bucket", local_path=dest_file
@@ -168,22 +171,21 @@ def get_data():
 
 @dag(
     default_args=default_args,
-    schedule_interval=datetime.timedelta(days=1),
-    start_date=datetime.datetime(2022, 1, 1),
+    schedule_interval=None,
+    start_date=days_ago(1),
     catchup=False,
     tags=["mlops"],
 )
 def ml_training_pipeline():
 
     start = start_pipeline()
-
     data = get_data()
     training_data = split_data(data)
     model_training = train_log_model(training_data)
     cleanup = delete_temp_files()
     end = end_pipeline()
 
-    start >> data >> training_data >> model_training >> cleanup >> end
+    (start >> data >> training_data >> model_training >> cleanup >> end)
 
 
 dag_instance = ml_training_pipeline()

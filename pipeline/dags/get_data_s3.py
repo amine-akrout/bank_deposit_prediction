@@ -5,6 +5,7 @@ import os
 import pandas as pd
 from airflow.decorators import dag, task
 from airflow.models import Connection
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.settings import Session
 from airflow.utils.dates import days_ago
@@ -140,10 +141,26 @@ def etl_to_s3_dag():
     data = fetch_data()
     create_s3_bucket = create_s3_bucket_if_not_exists()
     upload_data = upload_data_to_s3(data)
+    trigger_training = TriggerDagRunOperator(
+        task_id="trigger_training_dag",
+        trigger_dag_id="ml_training_pipeline",
+        wait_for_completion=True,
+        deferrable=True,
+        execution_date="{{ execution_date }}",
+        allowed_states=["success"],
+    )
     end = end_pipeline()
 
     # Define Task Dependencies
-    (start >> s3_connection >> data >> create_s3_bucket >> upload_data >> end)
+    (
+        start
+        >> s3_connection
+        >> data
+        >> create_s3_bucket
+        >> upload_data
+        >> trigger_training
+        >> end
+    )
 
 
 # Assign the DAG to a variable
