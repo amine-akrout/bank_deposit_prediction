@@ -97,6 +97,8 @@ def read_data(file_path: str):
 def split_data(data, test_size=0.3):
     logging.info("Splitting data into train and validation sets")
     data = data["data"]
+    print(data.head())
+    print(data.columns)
     y = data["deposit"]
     X = data.drop(columns="deposit", axis=1)
     cat_features = list(set(X.columns) - set(X._get_numeric_data().columns))
