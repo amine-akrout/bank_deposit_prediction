@@ -5,3 +5,4 @@ numpy==1.26.4
 scikit_learn==1.2.2
 apache-airflow-providers-amazon
 ucimlrepo==0.0.7
+python-dotenv
