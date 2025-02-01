@@ -17,7 +17,8 @@ logging.basicConfig(
 )
 
 # Constants
-BUCKET_NAME = "data-bucket"
+DATA_BUCKET_NAME = "data-bucket"
+MODEL_BUCKET_NAME = "model-bucket"
 OBJECT_NAME = "data/bank.parquet"
 
 
@@ -74,15 +75,16 @@ def fetch_data():
 def create_s3_bucket_if_not_exists():
     hook = S3Hook(aws_conn_id="my_s3_connection")
     # Check if the bucket already exists
-    if not hook.check_for_bucket(BUCKET_NAME):
-        try:
-            # Create the bucket
-            hook.create_bucket(BUCKET_NAME)
-            logging.info(f"Bucket '{BUCKET_NAME}' created successfully .")
-        except Exception as e:
-            logging.error(f"Failed to create bucket '{BUCKET_NAME}'. Error: {e}")
-    else:
-        logging.info(f"Bucket '{BUCKET_NAME}' already exists. No action taken.")
+    for bucket in [DATA_BUCKET_NAME, MODEL_BUCKET_NAME]:
+        if not hook.check_for_bucket(bucket):
+            try:
+                # Create the bucket
+                hook.create_bucket(bucket)
+                logging.info(f"Bucket '{bucket}' created successfully .")
+            except Exception as e:
+                logging.error(f"Failed to create bucket '{bucket}'. Error: {e}")
+        else:
+            logging.info(f"Bucket '{bucket}' already exists. No action taken.")
 
 
 @task
@@ -105,13 +107,13 @@ def upload_data_to_s3(data):
     # Use the hook to upload data to the bucket
     hook.load_bytes(
         buffer.getvalue(),
-        bucket_name=BUCKET_NAME,
+        bucket_name=DATA_BUCKET_NAME,
         key=OBJECT_NAME,
-        replace=True,  # Set to True to overwrite if the object already exists
+        replace=True,
     )
     logging.info(
         "Data uploaded successfully to bucket '{}' with key '{}'.".format(
-            BUCKET_NAME, OBJECT_NAME
+            DATA_BUCKET_NAME, OBJECT_NAME
         )
     )
 

@@ -147,12 +147,32 @@ def train_log_model(training_data):
 
 
 @task
+def export_model_to_s3():
+    """
+    Export the model to S3
+    """
+    local_model_path = "./catboost-model"
+    s3_bucket = "model-bucket"
+    hook = S3Hook("my_s3_connection")
+    for file in os.listdir(local_model_path):
+        hook.load_file(
+            filename=f"{local_model_path}/{file}",
+            key=f"model/{file}",
+            bucket_name=s3_bucket,
+        )
+        logging.info(f"Uploaded {file} to S3 bucket")
+
+
+@task
 def delete_temp_files():
     logging.info("Deleting temporary files")
     for file in os.listdir("data/"):
         if file.startswith("airflow_tmp"):
             os.remove(f"data/{file}")
             logging.info(f"Deleted file: {file}")
+    logging.info("Temporary files deleted")
+    logging.info("Deleting model directory")
+    shutil.rmtree("./catboost-model")
 
 
 @task
@@ -182,10 +202,11 @@ def ml_training_pipeline():
     data = get_data()
     training_data = split_data(data)
     model_training = train_log_model(training_data)
+    model_export = export_model_to_s3()
     cleanup = delete_temp_files()
     end = end_pipeline()
 
-    (start >> data >> training_data >> model_training >> cleanup >> end)
+    (start >> data >> training_data >> model_training >> model_export >> cleanup >> end)
 
 
 dag_instance = ml_training_pipeline()

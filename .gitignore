@@ -35,11 +35,20 @@ aws-task-definition.json
 
 # env file
 .env
+
+# mlflow
 /src/pipeline/logs
 /src/pipeline/mlruns
+
+# catboost
 /src/pipeline/catboost-model
 /src/pipeline/catboost_info
+
+# airflow
 /src/pipeline/airflow.cfg
 /src/pipeline/airflow-webserver.pid
 /src/pipeline/airflow.db
 /src/pipeline/standalone_admin_password.txt
+
+# minio
+/minio
