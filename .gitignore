@@ -17,7 +17,7 @@ __pycache__/
 */catboost_info
 
 # airflow logs
-*/logs/*
+logs/*
 pipeline/airflow-webserver.pid
 pipeline/airflow.cfg
 pipeline/airflow.db
@@ -35,3 +35,11 @@ aws-task-definition.json
 
 # env file
 .env
+/src/pipeline/logs
+/src/pipeline/mlruns
+/src/pipeline/catboost-model
+/src/pipeline/catboost_info
+/src/pipeline/airflow.cfg
+/src/pipeline/airflow-webserver.pid
+/src/pipeline/airflow.db
+/src/pipeline/standalone_admin_password.txt
