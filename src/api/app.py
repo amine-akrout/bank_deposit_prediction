@@ -7,22 +7,26 @@ import os
 from typing import Any, List
 
 import mlflow
+from dotenv import load_dotenv
 from flask import Flask, Response, render_template, request
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load configuration from environment variables
-MODEL_PATH = os.getenv("MODEL_PATH", "./catboost-model")
+# MODEL_PATH = os.getenv("MODEL_PATH", "./catboost-model")
+MODEL_S3_PATH = os.getenv("MODEL_S3_PATH", "s3://model-bucket/model")
 PORT = int(os.getenv("PORT", 5000))
 
-# Load model as a PyFuncModel
 try:
-    loaded_model = mlflow.pyfunc.load_model(MODEL_PATH)
-    logger.info("Model loaded successfully")
+    loaded_model = mlflow.pyfunc.load_model(MODEL_S3_PATH)
+    logger.info("Model loaded successfully from Minio S3")
 except Exception as e:
-    logger.error(f"Failed to load model: {e}")
+    logger.error(f"Failed to load model from {MODEL_S3_PATH}: {e}")
     raise
 
 app = Flask(__name__)
