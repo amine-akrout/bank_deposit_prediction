@@ -1,3 +1,5 @@
+"""DAG to fetch data from the UCIML repository and upload it to an S3 bucket."""
+
 import io
 import logging
 import os
@@ -24,21 +26,23 @@ OBJECT_NAME = "data/bank.parquet"
 
 @task
 def create_s3_connection():
+    """Create an S3 connection in Airflow."""
     # Load environment variables
     load_dotenv()
     aws_access_key_id = os.environ.get("S3_ACCESS_KEY")
     aws_secret_access_key = os.environ.get("S3_SECRET_KEY")
+    host = os.environ.get("S3_HOST")
     s3_conn = Connection(
         conn_id="my_s3_connection",
         conn_type="aws",
         extra={
             "aws_access_key_id": aws_access_key_id,
             "aws_secret_access_key": aws_secret_access_key,
-            "host": "http://minio:9000",
+            "host": host,
         },
     )
     logging.info("S3 connection created")
-    logging.info(f"s3_conn: {s3_conn}")
+    logging.info("s3_conn: %s", s3_conn)
     # Start a session with Airflow's database
     session = Session()
 
@@ -73,6 +77,7 @@ def fetch_data():
 
 @task
 def create_s3_bucket_if_not_exists():
+    """Create an S3 bucket if it does not exist."""
     hook = S3Hook(aws_conn_id="my_s3_connection")
     # Check if the bucket already exists
     for bucket in [DATA_BUCKET_NAME, MODEL_BUCKET_NAME]:
@@ -80,11 +85,11 @@ def create_s3_bucket_if_not_exists():
             try:
                 # Create the bucket
                 hook.create_bucket(bucket)
-                logging.info(f"Bucket '{bucket}' created successfully .")
+                logging.info("Bucket %s created successfully .", bucket)
             except Exception as e:
-                logging.error(f"Failed to create bucket '{bucket}'. Error: {e}")
+                logging.error("Failed to create bucket %s: %s", bucket, e)
         else:
-            logging.info(f"Bucket '{bucket}' already exists. No action taken.")
+            logging.info("Bucket %s already exists. No action taken.", bucket)
 
 
 @task
@@ -112,19 +117,21 @@ def upload_data_to_s3(data):
         replace=True,
     )
     logging.info(
-        "Data uploaded successfully to bucket '{}' with key '{}'.".format(
-            DATA_BUCKET_NAME, OBJECT_NAME
-        )
+        "Data uploaded successfully to bucket %s with key %s.",
+        DATA_BUCKET_NAME,
+        OBJECT_NAME,
     )
 
 
 @task
 def start_pipeline():
+    """Log the start of the pipeline."""
     logging.info("Pipeline started")
 
 
 @task
 def end_pipeline():
+    """Log the end of the pipeline."""
     logging.info("Pipeline ended")
 
 
@@ -137,6 +144,7 @@ def end_pipeline():
     default_args={"owner": "airflow", "retries": 1},
 )
 def etl_to_s3_dag():
+    """Fetch data from the UCIML repository and upload it to an S3 bucket."""
     # Define Task Flow
     start = start_pipeline()
     s3_connection = create_s3_connection()
