@@ -52,3 +52,4 @@ aws-task-definition.json
 
 # minio
 /minio
+/k8s

@@ -1,5 +1,5 @@
 """
-Module to run the web application.
+Module to run the web application for the model prediction.
 """
 
 import logging
@@ -18,7 +18,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load configuration from environment variables
-# MODEL_PATH = os.getenv("MODEL_PATH", "./catboost-model")
 MODEL_S3_PATH = os.getenv("MODEL_S3_PATH", "s3://model-bucket/model")
 PORT = int(os.getenv("PORT", 5000))
 
