@@ -15,5 +15,7 @@ USER root
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+EXPOSE 8080
+
 USER airflow
 ENTRYPOINT ["/bin/bash","/start.sh"]

@@ -16,4 +16,4 @@ EXPOSE 5000
 
 # Run the web service on container startup using gunicorn
 
-CMD exec gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 8 --timeout 0 app:app
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.api.app:app"]

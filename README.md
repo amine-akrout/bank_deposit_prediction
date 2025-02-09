@@ -50,7 +50,7 @@ docker run -p 8080:8080 bankdeposit
 </pre>
 the Web app should be runnining on http://localhost:8080/
 
-## Deploy to Google Cloud App Engine
+## Deploy to AWS ECS
 
 
 <pre>

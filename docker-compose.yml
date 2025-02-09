@@ -6,9 +6,10 @@ services:
     environment:
       - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=True
     volumes:
-      - ./pipeline:/opt/airflow
-      - ./pipeline/dags:/opt/airflow/dags
-      - ./pipeline/plugins:/opt/airflow/plugins
+      - /src/pipeline:/opt/airflow
+      - /src/pipeline/dags:/opt/airflow/dags
+      - /src/pipeline/plugins:/opt/airflow/plugins
+      - /src/pipeline/data:/opt/airflow/data
     ports:
       - "8080:8080"
     command: airflow standalone
@@ -28,6 +29,15 @@ services:
       - mlops-net
     volumes:
       - ./minio/data:/data
+  api:
+    build:
+      context: api
+      dockerfile: src/api/Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - minio
+      - airflow
 
 networks:
   mlops-net:
